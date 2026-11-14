@@ -3835,6 +3835,10 @@ The Indicator SDO contains a simple textual description, the Kill Chain Phases t
 
 Relationships from the Indicator can describe the malicious or suspicious behavior that it directly detects (Malware, Tool, and Attack Pattern). In addition, it may also imply the presence of a Campaigns, Intrusion Sets, and Threat Actors, etc.
 
+The **valid_from** and **valid_until** properties describe the time window in which the Indicator is considered a valid indicator of the behaviors it is related to or represents. This time window is distinct from revocation of the object (see [section 3.6](#versioning)). If the most recent version of an Indicator has the **revoked** property set to **true**, the Indicator **MUST NOT** be considered valid, regardless of the values of **valid_from** and **valid_until**.
+
+Conversely, an Indicator whose **valid_until** time has passed is not revoked. Its creator can still issue new versions of it, for example to extend the validity time window.
+
 ### 4.9.1 Properties <a id="indicator-properties"></a>
 
 <table border="1" cellspacing="0" cellpadding="6" width="100%">
@@ -3913,7 +3917,7 @@ Relationships from the Indicator can describe the malicious or suspicious behavi
   <tr>
     <td><strong>valid_until</strong> (optional)</td>
     <td><a class="stixtype" href="#timestamp">timestamp</a></td>
-    <td>The time at which this Indicator should no longer be considered a valid indicator of the behaviors it is related to or represents.<br /><br />If the <strong>valid_until</strong> property is omitted, then there is no constraint on the latest time for which the Indicator is valid.<br /><br />This <strong>MUST</strong> be greater than the timestamp in the <strong>valid_from</strong> property.</td>
+    <td>The time at which this Indicator should no longer be considered a valid indicator of the behaviors it is related to or represents.<br /><br />If the <strong>valid_until</strong> property is omitted, then there is no constraint on the latest time for which the Indicator is valid.<br /><br />This <strong>MUST</strong> be greater than the timestamp in the <strong>valid_from</strong> property.<br /><br />If an Indicator has been revoked using the <strong>revoked</strong> property then <strong>valid_until</strong> does not need to be separately updated as all versions of this Indicator are now revoked and thus not valid.</td>
   </tr>
   <tr>
     <td><strong>kill_chain_phases</strong> (optional)</td>
@@ -3921,16 +3925,6 @@ Relationships from the Indicator can describe the malicious or suspicious behavi
     <td>The kill chain phase(s) to which this Indicator corresponds.</td>
   </tr>
 </table>
-
-#### Indicator Validity and Revocation
-
-Indicator validity and object revocation are distinct mechanisms serving different purposes. The **valid_from** and **valid_until** properties define the period during which an Indicator is considered valid for representing the associated behavior. The **revoked** property indicates the permanent withdrawal of the STIX object by its creator, independently of its validity period.
-
-When determining whether an Indicator is currently valid, consumers **MUST** consider the **revoked** property of the most recent known version of the Indicator, in addition to **valid_from** and **valid_until**. If that version has **revoked** set to **true**, the Indicator **MUST NOT** be considered currently valid, regardless of its validity period. As defined in [section 3.6](#versioning), revocation applies to all versions of the object.
-
-Revocation does not require producers to modify **valid_from** or **valid_until**. These properties retain their historical meaning but **MUST NOT** override the revoked status when determining current Indicator validity. This requirement does not prescribe whether consumers retain, archive, or delete revoked objects.
-
-Expiration of an Indicator's validity period **MUST NOT** be interpreted as revocation of the STIX object. An expired Indicator that has not been revoked **MAY** be updated through normal STIX object versioning, whereas a revoked Indicator cannot be reactivated under the same STIX ID.
 
 ### 4.9.2 Relationships <a id="indicator-relationships"></a>
 
